@@ -1,1 +1,1706 @@
-Vextom_Language_Learning.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vextom Language Learning</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        vextom: {
+                            red: '#FF0033',
+                            dark: '#1e1b18',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --app-bg: linear-gradient(135deg, #fef3c7 0%, #ffedd5 45%, #fce7f3 100%);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--app-bg);
+            background-attachment: fixed;
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: #1c1917;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hardware Accelerated GPU Animations */
+        .gpu-layer {
+            will-change: transform, opacity;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        /* Card Flip with GPU Smoothness */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .flip-card-inner {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Anti-Cheat Warning Shake */
+        @keyframes antiCheatShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake-warning {
+            animation: antiCheatShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        /* Interactive Micro-Spring Button */
+        .btn-tap-effect {
+            transition: transform 0.12s ease-out, opacity 0.12s ease-out, background-color 0.15s ease;
+        }
+        .btn-tap-effect:active {
+            transform: scale(0.96) translateZ(0);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 0, 51, 0.2);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FF0033;
+        }
+    </style>
+</head>
+<body class="min-h-[100dvh] flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+
+    <!-- Header & Navigation -->
+    <header class="border-b border-orange-200/60 bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-2">
+            
+            <!-- Brand Logo Mark -->
+            <div class="flex items-center space-x-2.5 cursor-pointer btn-tap-effect" onclick="switchTab('flashcards')">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-400 to-rose-400 p-[2px] shadow-sm flex items-center justify-center shrink-0">
+                    <div class="w-full h-full bg-white/95 rounded-[14px] flex items-center justify-center">
+                        <span class="text-vextom-red font-black text-xl tracking-tighter leading-none">V</span>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-sm font-black tracking-widest text-slate-900 uppercase leading-none">VEXTOM</h1>
+                    <p class="text-[9px] text-slate-500 font-mono tracking-wide mt-0.5">Spoken Sound Engine</p>
+                </div>
+            </div>
+
+            <!-- Stats & Top-Right Profile Pill -->
+            <div class="flex items-center gap-2">
+                <!-- V-Rating Badge -->
+                <div class="flex items-center gap-1.5 bg-slate-900 text-white px-3 py-1.5 rounded-xl text-xs font-mono font-bold shadow-sm shrink-0">
+                    <i class="fa-solid fa-trophy text-amber-400 text-xs"></i>
+                    <span id="header-v-rating">100V</span>
+                </div>
+
+                <!-- Active Track Indicator -->
+                <div class="hidden sm:flex items-center gap-1.5 bg-white border border-orange-200 px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-slate-700 shadow-sm shrink-0">
+                    <i class="fa-solid fa-globe text-vextom-red"></i>
+                    <span id="header-active-lang">English</span>
+                    <span id="header-lang-pct" class="text-vextom-red ml-0.5">0%</span>
+                </div>
+
+                <!-- Profile Target (Minimum 48px Touch) -->
+                <button onclick="openProfileModal()" class="min-h-[48px] px-3 flex items-center gap-2 bg-white hover:bg-orange-50/80 border border-orange-200 rounded-xl text-xs font-mono font-bold text-slate-800 transition-all btn-tap-effect shadow-sm">
+                    <div id="header-avatar-badge" class="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-rose-400 text-white flex items-center justify-center text-xs shrink-0">
+                        <i id="header-avatar-icon" class="fa-solid fa-bolt"></i>
+                    </div>
+                    <span id="header-username" class="max-w-[85px] sm:max-w-[110px] truncate">VextomUser</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Touch-Optimized Navigation Bar (>=48px Touch Target Height) -->
+        <nav class="max-w-4xl mx-auto px-4 flex space-x-1.5 overflow-x-auto text-xs font-mono tracking-wider py-1.5 scrollbar-none">
+            <button onclick="switchTab('flashcards')" id="tab-btn-flashcards" class="nav-tab-btn min-h-[48px] px-4 py-2.5 rounded-xl border border-vextom-red bg-white text-vextom-red font-bold transition-all shadow-sm shrink-0 flex items-center justify-center btn-tap-effect">
+                <i class="fa-solid fa-layer-group mr-2"></i> Flashcards
+            </button>
+            <button onclick="switchTab('blitz')" id="tab-btn-blitz" class="nav-tab-btn min-h-[48px] px-4 py-2.5 rounded-xl border border-transparent text-slate-600 hover:text-slate-900 transition-all shrink-0 flex items-center justify-center btn-tap-effect">
+                <i class="fa-solid fa-bolt text-amber-500 mr-2"></i> Blitz Mode
+            </button>
+            <button onclick="switchTab('versus')" id="tab-btn-versus" class="nav-tab-btn min-h-[48px] px-4 py-2.5 rounded-xl border border-transparent text-slate-600 hover:text-slate-900 transition-all shrink-0 flex items-center justify-center btn-tap-effect">
+                <i class="fa-solid fa-swords text-rose-500 mr-2"></i> Versus Duel
+            </button>
+            <button onclick="switchTab('decoder')" id="tab-btn-decoder" class="nav-tab-btn min-h-[48px] px-4 py-2.5 rounded-xl border border-transparent text-slate-600 hover:text-slate-900 transition-all shrink-0 flex items-center justify-center btn-tap-effect">
+                <i class="fa-solid fa-sliders mr-2"></i> Decoder &amp; Builder
+            </button>
+            <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="nav-tab-btn min-h-[48px] px-4 py-2.5 rounded-xl border border-transparent text-slate-600 hover:text-slate-900 transition-all shrink-0 flex items-center justify-center btn-tap-effect">
+                <i class="fa-solid fa-ranking-star text-amber-500 mr-2"></i> Leaderboard
+            </button>
+            <button onclick="switchTab('aitutor')" id="tab-btn-aitutor" class="nav-tab-btn min-h-[48px] px-4 py-2.5 rounded-xl border border-transparent text-slate-600 hover:text-slate-900 transition-all shrink-0 flex items-center justify-center btn-tap-effect">
+                <i class="fa-solid fa-robot text-vextom-red mr-2"></i> AI Tutor
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content Stage -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 flex-grow w-full">
+
+        <!-- ================= TAB 1: FLASHCARDS & CADENCE ================= -->
+        <section id="tab-flashcards" class="space-y-5 gpu-layer">
+            
+            <!-- Category & Language Bar -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white/80 border border-orange-200/80 p-3.5 rounded-3xl backdrop-blur-sm shadow-sm">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">TRACK:</span>
+                    <select id="flashcard-lang-select" onchange="onLanguageSelectChange(this.value)" class="min-h-[44px] bg-white border border-slate-200 text-slate-900 text-xs font-mono font-bold px-3 py-2 rounded-xl focus:outline-none focus:border-vextom-red shadow-sm">
+                        <!-- Populated dynamically -->
+                    </select>
+
+                    <div class="hidden sm:block h-4 w-[1px] bg-slate-200"></div>
+
+                    <div class="flex bg-slate-100 p-1 rounded-xl font-mono text-xs w-full sm:w-auto">
+                        <button onclick="setFlashcardCategory('words')" id="cat-btn-words" class="flex-1 sm:flex-none min-h-[40px] px-4 py-1.5 rounded-lg font-bold bg-slate-900 text-white shadow-sm transition-all btn-tap-effect">
+                            WORDS
+                        </button>
+                        <button onclick="setFlashcardCategory('letters')" id="cat-btn-letters" class="flex-1 sm:flex-none min-h-[40px] px-4 py-1.5 rounded-lg font-bold text-slate-600 hover:text-slate-900 transition-all btn-tap-effect">
+                            SYMBOLS (A-Z)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between sm:justify-end gap-2 text-xs font-mono text-slate-600">
+                    <span class="text-slate-400">TEMPO:</span>
+                    <select id="flashcard-tempo" class="min-h-[44px] bg-white border border-slate-200 text-slate-900 text-xs font-mono px-3 py-2 rounded-xl focus:outline-none">
+                        <option value="slow">SLOW (0.8x)</option>
+                        <option value="natural" selected>NATURAL (1.0x)</option>
+                        <option value="fast">RAPID (1.25x)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Flashcard Display -->
+            <div class="flex flex-col items-center space-y-5">
+                <div class="w-full max-w-md perspective-1000">
+                    <div id="flashcard-card-wrapper" onclick="flipFlashcard()" class="cursor-pointer w-full min-h-[300px] sm:min-h-[340px] bg-white border border-orange-200/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between items-center text-center shadow-md hover:shadow-xl transition-all duration-300 btn-tap-effect relative">
+                        
+                        <!-- Card Structure -->
+                        <div id="flashcard-inner-box" class="w-full h-full flex flex-col justify-between items-center min-h-[250px] my-auto">
+                            <!-- Front Side Content -->
+                            <div id="card-front-content" class="w-full flex flex-col justify-between items-center min-h-[250px] my-auto space-y-4">
+                                <div class="flex items-center justify-between w-full">
+                                    <span id="flashcard-progress-text" class="text-xs text-slate-400 font-mono tracking-wider">CARD 01 / 20</span>
+                                    <span id="flashcard-tier-badge" class="text-[10px] font-mono font-bold bg-orange-100 text-orange-800 px-2.5 py-1 rounded-full uppercase">TIER 1</span>
+                                </div>
+
+                                <div class="my-auto py-4 space-y-2">
+                                    <span id="card-front-lang-label" class="text-[11px] font-mono uppercase tracking-widest text-slate-400">ENGLISH WORD</span>
+                                    <h2 id="card-front-word" class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight uppercase">
+                                        AND
+                                    </h2>
+                                </div>
+
+                                <span class="text-xs text-slate-400 font-mono flex items-center gap-1.5">
+                                    <i class="fa-solid fa-hand-pointer text-vextom-red"></i> TAP TO REVEAL CADENCE
+                                </span>
+                            </div>
+
+                            <!-- Back Side Content -->
+                            <div id="card-back-content" class="w-full flex flex-col justify-between items-center min-h-[250px] my-auto space-y-4 hidden">
+                                <span class="text-xs font-mono font-bold text-vextom-red tracking-wider">VEXTOM CADENCE STREAM</span>
+
+                                <div class="my-auto py-2 space-y-3 w-full">
+                                    <div id="card-back-digits" class="font-mono text-2xl sm:text-3xl font-black text-slate-900 tracking-widest flex items-center justify-center flex-wrap gap-2">
+                                        <!-- Rendered dynamically -->
+                                    </div>
+                                    <p id="card-back-phonetic" class="text-xs font-mono text-slate-600 bg-orange-50/80 px-4 py-2 rounded-xl border border-orange-200/60 inline-block">
+                                        "one — nine squared — three"
+                                    </p>
+                                </div>
+
+                                <button onclick="event.stopPropagation(); speakFlashcardCadence();" class="min-h-[48px] px-6 py-2.5 bg-slate-900 hover:bg-vextom-red text-white text-xs font-mono font-bold rounded-xl flex items-center gap-2 transition-colors shadow-sm btn-tap-effect">
+                                    <i class="fa-solid fa-volume-high text-vextom-red"></i> SPEAK CADENCE
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Touch-Safe Controls (min 48px height) -->
+                <div class="flex items-center justify-between w-full max-w-md font-mono gap-3">
+                    <button onclick="prevFlashcard()" class="min-h-[48px] flex-1 px-4 py-3 bg-white border border-slate-200 hover:border-slate-300 text-slate-800 text-xs font-bold rounded-2xl transition-all shadow-sm btn-tap-effect flex items-center justify-center">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> PREV
+                    </button>
+                    
+                    <button onclick="speakFlashcardCadence()" class="min-h-[48px] w-14 h-12 bg-white border border-orange-200 text-vextom-red rounded-2xl flex items-center justify-center hover:scale-105 transition-all shadow-sm btn-tap-effect shrink-0">
+                        <i class="fa-solid fa-play text-lg"></i>
+                    </button>
+
+                    <button onclick="nextFlashcard()" class="min-h-[48px] flex-1 px-4 py-3 bg-slate-900 hover:bg-vextom-red text-white text-xs font-bold rounded-2xl transition-all shadow-sm btn-tap-effect flex items-center justify-center">
+                        NEXT <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: BLITZ MODE (WITH ANTI-CHEAT) ================= -->
+        <section id="tab-blitz" class="hidden space-y-5 gpu-layer">
+            <div id="blitz-container" class="bg-white/85 border border-orange-200/80 p-5 sm:p-8 rounded-3xl backdrop-blur-sm shadow-sm max-w-md mx-auto space-y-5">
+                
+                <!-- Blitz Header & Timer -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center text-base font-bold shrink-0">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xs font-mono font-bold text-slate-900 uppercase">BLITZ SPEED RUN</h2>
+                            <p class="text-[10px] font-mono text-slate-400">Anti-cheat guarded speed drill</p>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Clock -->
+                    <div class="flex items-center gap-3 font-mono">
+                        <div class="text-right">
+                            <span class="text-[9px] text-slate-400 block">TIMER</span>
+                            <span id="blitz-timer-text" class="text-2xl font-black text-slate-900">30s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Idle Start Screen -->
+                <div id="blitz-start-screen" class="text-center py-6 space-y-5">
+                    <div class="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-200 text-amber-500 flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold text-slate-900 font-mono">30-SECOND VEXTOM SPEED DRILL</h3>
+                        <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                            Decode streams rapidly. Earn +15V for correct answers. Button spamming and macro-clicking are blocked by anti-cheat lock.
+                        </p>
+                    </div>
+                    <button onclick="startBlitzSession()" class="min-h-[52px] w-full px-6 py-3.5 bg-slate-900 hover:bg-vextom-red text-white text-xs font-mono font-bold rounded-2xl shadow-md transition-all btn-tap-effect flex items-center justify-center">
+                        START BLITZ ROUND <i class="fa-solid fa-play ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Active Game Arena -->
+                <div id="blitz-game-arena" class="hidden space-y-5">
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div id="blitz-progress-bar" class="bg-gradient-to-r from-amber-400 via-orange-400 to-vextom-red h-full w-full transition-all duration-1000"></div>
+                    </div>
+
+                    <!-- Question Card -->
+                    <div class="text-center bg-orange-50/60 border border-orange-200/60 p-5 rounded-2xl space-y-1">
+                        <span id="blitz-prompt-type" class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">DECODE VEXTOM CADENCE STREAM</span>
+                        <div id="blitz-prompt-display" class="text-2xl sm:text-3xl font-black font-mono text-slate-900 tracking-wider">
+                            1 - 9² - 3
+                        </div>
+                    </div>
+
+                    <!-- Options Grid (>=48px height per option) -->
+                    <div id="blitz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono">
+                        <!-- Dynamic buttons -->
+                    </div>
+                </div>
+
+                <!-- Game Over Summary -->
+                <div id="blitz-summary-screen" class="hidden text-center py-4 space-y-5">
+                    <div class="inline-block p-4 rounded-3xl bg-slate-900 text-white font-mono space-y-1 min-w-[180px]">
+                        <span class="text-xs text-slate-400 block">ROUND SCORE</span>
+                        <span id="blitz-summary-score" class="text-3xl font-black text-amber-400">+45V</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 max-w-xs mx-auto font-mono text-xs">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200">
+                            <span class="text-slate-400 block text-[10px]">CORRECT</span>
+                            <strong id="blitz-summary-correct" class="text-emerald-600 text-base font-bold">0</strong>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200">
+                            <span class="text-slate-400 block text-[10px]">BEST STREAK</span>
+                            <strong id="blitz-summary-streak" class="text-vextom-red text-base font-bold">0</strong>
+                        </div>
+                    </div>
+
+                    <button onclick="startBlitzSession()" class="min-h-[48px] w-full py-3 bg-slate-900 hover:bg-vextom-red text-white text-xs font-mono font-bold rounded-2xl transition-all btn-tap-effect flex items-center justify-center">
+                        PLAY AGAIN <i class="fa-solid fa-rotate-right ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Anti-Cheat & Answer Feedback Banner -->
+                <div id="blitz-feedback-banner" class="hidden p-4 rounded-2xl text-xs font-mono font-bold text-center leading-relaxed"></div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: VERSUS DUEL ================= -->
+        <section id="tab-versus" class="hidden space-y-5 gpu-layer">
+            <div class="bg-white/85 border border-orange-200/80 p-5 sm:p-8 rounded-3xl backdrop-blur-sm shadow-sm max-w-md mx-auto space-y-5">
+                
+                <!-- Matchmaking Search Screen -->
+                <div id="versus-matchmake-screen" class="text-center py-8 space-y-5">
+                    <div class="w-16 h-16 rounded-3xl bg-rose-50 border border-rose-200 text-vextom-red flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-swords"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold font-mono text-slate-900">HEAD-TO-HEAD DUEL</h3>
+                        <p class="text-xs text-slate-500">Compete live against a skill-matched Vextom rival near your rating (<span id="versus-player-rating-display" class="font-bold text-slate-800">100V</span>).</p>
+                    </div>
+                    <button onclick="startVersusMatchmaking()" class="min-h-[52px] w-full px-6 py-3.5 bg-slate-900 hover:bg-vextom-red text-white text-xs font-mono font-bold rounded-2xl shadow-md transition-all btn-tap-effect flex items-center justify-center">
+                        FIND OPPONENT <i class="fa-solid fa-search ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Searching Animation -->
+                <div id="versus-searching-screen" class="hidden text-center py-10 space-y-4">
+                    <div class="w-12 h-12 rounded-full border-4 border-orange-200 border-t-vextom-red animate-spin mx-auto"></div>
+                    <p class="font-mono text-xs font-bold text-slate-700">MATCHMAKING... FINDING RIVAL</p>
+                </div>
+
+                <!-- Active Duel Arena -->
+                <div id="versus-arena" class="hidden space-y-5">
+                    <!-- Versus Scoreboard Header -->
+                    <div class="grid grid-cols-11 items-center bg-slate-900 text-white p-3.5 rounded-2xl font-mono">
+                        <div class="col-span-5 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-rose-400 p-[1.5px] shrink-0">
+                                <div class="w-full h-full bg-slate-900 rounded-[9px] flex items-center justify-center text-[10px]">
+                                    <i id="duel-user-icon" class="fa-solid fa-bolt text-amber-400"></i>
+                                </div>
+                            </div>
+                            <div class="truncate">
+                                <span id="duel-user-name" class="text-xs font-bold block truncate">You</span>
+                                <span id="duel-user-rating" class="text-[9px] text-amber-400">100V</span>
+                            </div>
+                            <span id="duel-user-score-badge" class="ml-auto text-lg font-black text-emerald-400">0</span>
+                        </div>
+
+                        <div class="col-span-1 text-center font-black text-vextom-red text-xs">VS</div>
+
+                        <div class="col-span-5 flex items-center gap-2 flex-row-reverse text-right">
+                            <div class="w-8 h-8 rounded-xl bg-slate-800 text-rose-400 flex items-center justify-center text-[10px] border border-rose-500/30 shrink-0">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="truncate">
+                                <span id="duel-bot-name" class="text-xs font-bold block truncate font-mono">VexBot</span>
+                                <span id="duel-bot-rating" class="text-[9px] text-rose-400">105V</span>
+                            </div>
+                            <span id="duel-bot-score-badge" class="mr-auto text-lg font-black text-rose-400">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Status Bar -->
+                    <div class="flex items-center justify-between text-xs font-mono text-slate-500 bg-orange-50/60 px-4 py-2 rounded-xl border border-orange-200/60">
+                        <span>ROUND <strong id="duel-round-num" class="text-slate-900">1 / 5</strong></span>
+                        <span id="duel-bot-status" class="text-slate-600 font-bold"><i class="fa-solid fa-spinner animate-spin text-vextom-red mr-1"></i> Opponent thinking...</span>
+                    </div>
+
+                    <!-- Prompt Box -->
+                    <div class="text-center bg-white border border-slate-200 p-5 rounded-2xl space-y-1 shadow-sm">
+                        <span id="duel-prompt-label" class="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-widest">TRANSLATE WORD TO VEXTOM</span>
+                        <div id="duel-prompt-text" class="text-2xl sm:text-3xl font-black font-mono text-slate-900 tracking-wider">
+                            MEET
+                        </div>
+                    </div>
+
+                    <!-- Options (>=48px height) -->
+                    <div id="duel-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono">
+                        <!-- Dynamic choices -->
+                    </div>
+
+                    <!-- Round Feedback Banner -->
+                    <div id="duel-round-feedback" class="hidden p-4 rounded-2xl text-xs font-mono font-bold text-center leading-relaxed"></div>
+                </div>
+
+                <!-- Match Complete Summary -->
+                <div id="versus-summary-screen" class="hidden text-center py-6 space-y-5">
+                    <div id="versus-result-badge" class="inline-block px-6 py-2.5 rounded-2xl font-mono font-black text-xl bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        VICTORY!
+                    </div>
+
+                    <div class="font-mono space-y-0.5">
+                        <span class="text-xs text-slate-400 block">RATING ADJUSTMENT</span>
+                        <div id="versus-rating-delta" class="text-3xl font-black text-slate-900">+16V</div>
+                    </div>
+
+                    <button onclick="resetVersusTab()" class="min-h-[48px] w-full py-3 bg-slate-900 hover:bg-vextom-red text-white text-xs font-mono font-bold rounded-2xl transition-all btn-tap-effect flex items-center justify-center">
+                        NEXT MATCH <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: CHUNK DECODER & BUILDER ================= -->
+        <section id="tab-decoder" class="hidden space-y-6 gpu-layer">
+            <!-- Chunk Decoder -->
+            <div class="bg-white/85 border border-orange-200/80 p-5 sm:p-7 rounded-3xl backdrop-blur-sm shadow-sm max-w-md mx-auto space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h2 class="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider">
+                        CHUNK DECODER DRILL
+                    </h2>
+                    <span class="text-[10px] font-mono text-slate-400">UNPACK SOUND STREAM</span>
+                </div>
+
+                <div class="text-center space-y-1">
+                    <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">RAW VEXTOM CADENCE STREAM</span>
+                    <div id="decoder-raw-stream" class="text-2xl font-mono font-black text-slate-900 tracking-widest">
+                        1 - 9² - 3
+                    </div>
+                </div>
+
+                <!-- Interactive Symbol Slots -->
+                <div id="decoder-interactive-slots" class="flex flex-wrap items-center justify-center gap-2 py-1">
+                    <!-- Dynamic slots -->
+                </div>
+
+                <!-- Verification Bar -->
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex items-center justify-between font-mono gap-2">
+                    <div class="text-xs text-slate-500 font-bold truncate">
+                        DECODED: <strong id="decoder-revealed-text" class="text-lg font-black text-vextom-red tracking-widest ml-1">_ _ _</strong>
+                    </div>
+                    <button onclick="checkDecoderPuzzle()" class="min-h-[48px] px-4 py-2.5 bg-slate-900 hover:bg-vextom-red text-white text-xs font-bold rounded-xl transition-all shadow-sm btn-tap-effect shrink-0">
+                        VERIFY
+                    </button>
+                </div>
+
+                <div id="decoder-feedback" class="hidden p-4 rounded-2xl text-xs font-mono font-bold text-center leading-relaxed"></div>
+            </div>
+
+            <!-- Live Phrase Builder -->
+            <div class="bg-white/85 border border-orange-200/80 p-5 sm:p-7 rounded-3xl backdrop-blur-sm shadow-sm max-w-3xl mx-auto space-y-5">
+                <h2 class="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider">
+                    LIVE PHRASE BUILDER &amp; LEXICON
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 font-mono">
+                    <div class="md:col-span-5 space-y-1.5">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase block">INPUT PHRASE (ACCENTS STRIPPED AUTOMATICALLY)</label>
+                        <textarea id="builder-input-text" oninput="updateLivePhraseBuilder()" rows="3" placeholder="TYPE ANY PHRASE..." class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl text-slate-900 text-xs font-bold focus:border-vextom-red focus:outline-none uppercase resize-none shadow-sm">MEET AT HOME NOW</textarea>
+                    </div>
+
+                    <div class="md:col-span-7 space-y-1.5 flex flex-col justify-between">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase block">GENERATED VEXTOM CADENCE</label>
+                        <div class="bg-white border border-slate-200 p-4 rounded-2xl flex flex-col justify-between min-h-[105px] space-y-2 shadow-sm">
+                            <div id="builder-output-digits" class="font-mono text-xs sm:text-sm font-bold text-slate-900 tracking-wider break-all">
+                                9 - 3² - 3² - 13² &nbsp;•&nbsp; 1 - 13² &nbsp;•&nbsp; 5² - 10 - 9 - 3² &nbsp;•&nbsp; 9² - 10 - 15²
+                            </div>
+                            <div class="flex items-center justify-between border-t border-slate-100 pt-2.5">
+                                <span id="builder-phonetic-preview" class="text-[11px] text-slate-400 font-mono truncate max-w-[200px] sm:max-w-xs">"nine — three squared..."</span>
+                                <button onclick="playBuilderSpokenPhrase()" class="min-h-[44px] px-4 py-2 bg-slate-900 hover:bg-vextom-red text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-colors btn-tap-effect shrink-0">
+                                    <i class="fa-solid fa-volume-high text-vextom-red"></i> SPEAK
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Symbol Grid -->
+                <div class="space-y-3 pt-3 border-t border-slate-100">
+                    <h3 class="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider">
+                        VEXTOM SYMBOL TABLE (A-Z)
+                    </h3>
+                    <div id="lexicon-grid" class="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-9 gap-2 font-mono text-center">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 5: LEADERBOARD ================= -->
+        <section id="tab-leaderboard" class="hidden space-y-5 gpu-layer">
+            
+            <!-- Summary Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono">
+                <div class="bg-white/85 border border-orange-200/80 p-4 rounded-2xl shadow-sm space-y-0.5">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">LANGUAGES MASTERED</span>
+                    <div id="stat-langs-mastered" class="text-2xl font-black text-slate-900">0 / 5</div>
+                </div>
+                <div class="bg-white/85 border border-orange-200/80 p-4 rounded-2xl shadow-sm space-y-0.5">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">CURRENT TRACK PROGRESS</span>
+                    <div id="stat-current-pct" class="text-2xl font-black text-vextom-red">0%</div>
+                </div>
+                <div class="bg-white/85 border border-orange-200/80 p-4 rounded-2xl shadow-sm space-y-0.5">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase">ELO RATING</span>
+                    <div id="stat-v-rating" class="text-2xl font-black text-amber-500">100V</div>
+                </div>
+            </div>
+
+            <!-- Rankings Table -->
+            <div class="bg-white/85 border border-orange-200/80 rounded-3xl p-4 sm:p-6 backdrop-blur-sm shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-xs font-mono font-bold text-slate-900 uppercase">GLOBAL VEXTOM LEADERBOARD</h2>
+                        <p class="text-[10px] font-mono text-slate-400">Click any player to inspect their learning journey</p>
+                    </div>
+                    <span class="text-[10px] font-mono font-bold bg-orange-100 text-orange-800 px-2.5 py-1 rounded-lg">SEASON 1</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left font-mono text-xs">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-100 text-[10px] uppercase">
+                                <th class="pb-2.5 pl-2">RANK</th>
+                                <th class="pb-2.5">PLAYER</th>
+                                <th class="pb-2.5 text-center">RATING</th>
+                                <th class="pb-2.5 text-center">MASTERED</th>
+                                <th class="pb-2.5 text-right pr-2">PROGRESS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-table-body" class="divide-y divide-slate-100">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 6: AI TUTOR ================= -->
+        <section id="tab-aitutor" class="hidden space-y-5 gpu-layer">
+            <div class="bg-white/85 border border-orange-200/80 p-5 sm:p-7 rounded-3xl backdrop-blur-sm shadow-sm space-y-4 max-w-3xl mx-auto">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-xs font-mono font-bold text-slate-900 uppercase tracking-wider">
+                            VEXTOM AI TUTOR &amp; PRACTICE CONVERSATIONALIST
+                        </h2>
+                        <p class="text-[10px] font-mono text-slate-400">Practice spoken sound streams live with Gemini AI</p>
+                    </div>
+                    <label class="flex items-center gap-1.5 cursor-pointer font-mono text-[11px] text-slate-600">
+                        <input type="checkbox" id="ai-auto-speak" checked class="accent-vextom-red w-4 h-4">
+                        <span>AUTO-SPEAK</span>
+                    </label>
+                </div>
+
+                <!-- Chat Messages Box -->
+                <div class="border border-slate-200 bg-white rounded-2xl flex flex-col h-[380px] sm:h-[420px] shadow-sm overflow-hidden">
+                    <div id="ai-chat-messages" class="flex-grow p-4 overflow-y-auto space-y-3 font-mono text-xs">
+                        <div class="flex items-start gap-2.5 bg-orange-50/60 p-3.5 rounded-2xl border border-orange-200/60 max-w-xl">
+                            <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400 to-rose-400 p-[1.5px] shrink-0">
+                                <div class="w-full h-full bg-white rounded-[9.5px] flex items-center justify-center font-black text-vextom-red text-[10px]">V</div>
+                            </div>
+                            <p class="text-slate-800 leading-relaxed pt-0.5">
+                                Welcome to Vextom AI. Ask me to translate words, test your rapid cadence, or converse in Vextom sound streams (e.g., "1 - 9² - 3").
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="ai-typing-indicator" class="hidden px-4 py-2 bg-slate-50 text-[11px] font-mono text-slate-400 flex items-center gap-2 border-t border-slate-100">
+                        <span class="w-2 h-2 rounded-full bg-vextom-red animate-pulse"></span>
+                        <span>PROCESSING VEXTOM SOUND STREAM...</span>
+                    </div>
+
+                    <!-- Chat Input Form (>=48px touch targets) -->
+                    <form onsubmit="handleAiChatSubmit(event)" class="p-2.5 bg-slate-50 border-t border-slate-100 flex gap-2 font-mono">
+                        <input type="text" id="ai-chat-input" placeholder="Type a word or Vextom tokens..." autocomplete="off" class="flex-grow min-h-[48px] bg-white border border-slate-200 text-slate-900 px-4 text-xs rounded-xl focus:border-vextom-red focus:outline-none transition-all">
+                        <button type="submit" id="ai-send-btn" class="min-h-[48px] px-5 bg-slate-900 hover:bg-vextom-red text-white text-xs font-bold rounded-xl transition-colors btn-tap-effect shrink-0">
+                            SEND
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-orange-200/60 bg-white/40 backdrop-blur-md py-3 text-center text-[11px] font-mono text-slate-500">
+        VEXTOM &bull; SPOKEN SOUND ENGINE
+    </footer>
+
+    <!-- ================= MODAL: EDIT PROFILE ================= -->
+    <div id="profile-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-orange-200 rounded-3xl p-6 max-w-md w-full shadow-2xl font-mono space-y-5 relative">
+            <button onclick="closeProfileModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 text-lg w-8 h-8 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                <div id="edit-avatar-preview" class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-rose-400 text-white flex items-center justify-center text-base shadow-sm">
+                    <i id="edit-avatar-icon-preview" class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 uppercase">EDIT PLAYER PROFILE</h3>
+                    <p class="text-[10px] text-slate-400">Customize your Vextom identity</p>
+                </div>
+            </div>
+
+            <form onsubmit="saveUserProfile(event)" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase block">PLAYER NAME</label>
+                    <input type="text" id="edit-username-input" class="min-h-[44px] w-full bg-slate-50 border border-slate-200 px-3.5 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-vextom-red">
+                    <div id="name-cooldown-notice" class="text-[10px] text-amber-600 font-bold hidden pt-0.5"></div>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase block">BIO / GOAL</label>
+                    <textarea id="edit-bio-input" rows="2" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:border-vextom-red resize-none"></textarea>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="text-[10px] text-slate-400 font-bold uppercase block">AVATAR BADGE ICON</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="selectAvatarIcon('fa-bolt')" class="min-h-[44px] min-w-[44px] border rounded-xl hover:border-vextom-red flex items-center justify-center"><i class="fa-solid fa-bolt text-amber-500"></i></button>
+                        <button type="button" onclick="selectAvatarIcon('fa-fire')" class="min-h-[44px] min-w-[44px] border rounded-xl hover:border-vextom-red flex items-center justify-center"><i class="fa-solid fa-fire text-rose-500"></i></button>
+                        <button type="button" onclick="selectAvatarIcon('fa-crown')" class="min-h-[44px] min-w-[44px] border rounded-xl hover:border-vextom-red flex items-center justify-center"><i class="fa-solid fa-crown text-amber-400"></i></button>
+                        <button type="button" onclick="selectAvatarIcon('fa-star')" class="min-h-[44px] min-w-[44px] border rounded-xl hover:border-vextom-red flex items-center justify-center"><i class="fa-solid fa-star text-amber-400"></i></button>
+                        <button type="button" onclick="selectAvatarIcon('fa-shield-halved')" class="min-h-[44px] min-w-[44px] border rounded-xl hover:border-vextom-red flex items-center justify-center"><i class="fa-solid fa-shield-halved text-indigo-500"></i></button>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="submit" class="min-h-[48px] flex-1 bg-slate-900 hover:bg-vextom-red text-white font-bold text-xs rounded-xl transition-all btn-tap-effect">
+                        SAVE PROFILE
+                    </button>
+                    <button type="button" onclick="resetNameCooldownForTesting()" class="min-h-[48px] px-3 bg-slate-100 text-slate-500 hover:text-slate-900 font-bold text-[10px] rounded-xl btn-tap-effect" title="Testing Override">
+                        RESET COOLDOWN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: PLAYER JOURNEY DETAILS ================= -->
+    <div id="journey-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white border border-orange-200 rounded-3xl p-6 max-w-md w-full shadow-2xl font-mono space-y-5 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeJourneyModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 text-lg w-8 h-8 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div id="modal-player-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-rose-400 text-white flex items-center justify-center text-lg shadow-sm shrink-0">
+                    <i id="modal-player-icon" class="fa-solid fa-crown"></i>
+                </div>
+                <div>
+                    <h3 id="modal-player-name" class="text-sm font-black text-slate-900 uppercase">CadenceKing</h3>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="modal-player-rating" class="bg-slate-900 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">450V</span>
+                        <span id="modal-player-rank" class="text-xs text-slate-400 font-bold">RANK #1</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-orange-50/60 p-3.5 rounded-2xl border border-orange-200/60 text-xs text-slate-700">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">PLAYER BIO</span>
+                <p id="modal-player-bio" class="leading-relaxed">Vextom speed learner since Day 1.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <span class="text-[9px] text-slate-400 block uppercase font-bold">MASTERED</span>
+                    <strong id="modal-player-langs" class="text-base font-black text-slate-900">2 / 5</strong>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <span class="text-[9px] text-slate-400 block uppercase font-bold">CURRENT PROGRESS</span>
+                    <strong id="modal-player-pct" class="text-base font-black text-vextom-red">85%</strong>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">LEARNING MILESTONES</span>
+                <div class="space-y-2 border-l-2 border-orange-200 pl-4 text-xs">
+                    <div class="relative">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute -left-[21px] top-1"></span>
+                        <p class="font-bold text-slate-900">Completed English Track</p>
+                        <span class="text-[10px] text-slate-400">100% Mastery reached</span>
+                    </div>
+                    <div class="relative">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 absolute -left-[21px] top-1"></span>
+                        <p class="font-bold text-slate-900">Passed 400+ V-Rating Benchmark</p>
+                        <span class="text-[10px] text-slate-400">High speed sound stream status</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Application Engine -->
+    <script>
+        // ================= VEXTOM LEXICON & NORMALIZATION =================
+        const VEXTOM_LEXICON = {
+            'A': '1',   'B': '1²',  'C': '2',   'D': '3',   'E': '3²',
+            'F': '4',   'G': '5',   'H': '5²',  'I': '6',   'J': '7',
+            'K': '7²',  'L': '8',   'M': '9',   'N': '9²',  'O': '10',
+            'P': '11',  'Q': '11²', 'R': '12',  'S': '13',  'T': '13²',
+            'U': '14',  'V': '15',  'W': '15²', 'X': '16',  'Y': '17',
+            'Z': '17²'
+        };
+
+        const PRONUNCIATIONS = {
+            '1': 'one',         '1²': 'one squared',
+            '2': 'two',
+            '3': 'three',       '3²': 'three squared',
+            '4': 'four',
+            '5': 'five',        '5²': 'five squared',
+            '6': 'six',
+            '7': 'seven',       '7²': 'seven squared',
+            '8': 'eight',
+            '9': 'nine',        '9²': 'nine squared',
+            '10': 'ten',
+            '11': 'eleven',     '11²': 'eleven squared',
+            '12': 'twelve',
+            '13': 'thirteen',   '13²': 'thirteen squared',
+            '14': 'fourteen',
+            '15': 'fifteen',    '15²': 'fifteen squared',
+            '16': 'sixteen',
+            '17': 'seventeen',  '17²': 'seventeen squared'
+        };
+
+        // Accent Stripping & Character Normalization
+        function normalizeWord(str) {
+            return str.normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/ñ/g, "n").replace(/Ñ/g, "N")
+                .toUpperCase()
+                .replace(/[^A-Z]/g, "");
+        }
+
+        // Language Decks (with Escalating Tiers)
+        const LANGUAGE_DECKS = {
+            'English': {
+                unlocked: true,
+                tier1: ['AND', 'YOU', 'YES', 'NO', 'NOW', 'GO', 'STOP', 'WAIT', 'TIME', 'COME', 'GOOD', 'BAD', 'HOME', 'CALL', 'TEXT', 'FAST'],
+                tier2: ['MEET', 'LATER', 'HERE', 'SPEED', 'TALK', 'LISTEN', 'QUICK', 'SOUND', 'STREAM', 'TRAIN', 'RHYTHM'],
+                tier3: ['MASTERY', 'DECODER', 'BLITZ', 'EVERYTHING', 'LANGUAGE', 'PROGRESSION', 'CONVERSATION']
+            },
+            'Spanish': {
+                unlocked: false,
+                tier1: ['HOLA', 'SI', 'NO', 'AGUA', 'CASA', 'TIEMPO', 'AMIGO', 'BUENO', 'RAPIDO', 'SOLO'],
+                tier2: ['GRACIAS', 'ADIOS', 'MANANA', 'SIEMPRE', 'HABLAR', 'ESCUCHAR', 'CAMINO'],
+                tier3: ['CONVERSACION', 'VELOCIDAD', 'LENGUAJE', 'DICCIONARIO']
+            },
+            'French': {
+                unlocked: false,
+                tier1: ['OUI', 'NON', 'EAU', 'JOUR', 'AMIS', 'TEMPS', 'BONBON', 'MONDE', 'VITE'],
+                tier2: ['BONJOUR', 'MERCI', 'DEMAIN', 'TOUJOURS', 'PARLER', 'ECOUTER'],
+                tier3: ['CONVERSATION', 'VITESSE', 'EXCELLENT', 'SILENCE']
+            },
+            'German': {
+                unlocked: false,
+                tier1: ['JA', 'NEIN', 'WORT', 'ZEIT', 'GUT', 'HAUS', 'SCHNELL', 'STADT'],
+                tier2: ['DANKE', 'HALLO', 'SPRACHE', 'HOREN', 'KOMMEN', 'LERNEN'],
+                tier3: ['GESPRACH', 'GESCHWINDIGKEIT', 'VERSTEHEN']
+            },
+            'Italian': {
+                unlocked: false,
+                tier1: ['CIAO', 'SI', 'NO', 'CASA', 'TEMPO', 'AMICO', 'BUONO', 'VELOCE'],
+                tier2: ['GRAZIE', 'PAROLA', 'SUONO', 'DOMANI', 'SEMPRE', 'PARLARE'],
+                tier3: ['CONVERSAZIONE', 'VELOCITA', 'ECCELLENTE']
+            }
+        };
+
+        const BOT_RIVALS = [
+            { name: "CadenceKing", rating: 450, mastered: 2, pct: 85, bio: "Vextom cadence master.", icon: "fa-crown" },
+            { name: "VexNova", rating: 380, mastered: 1, pct: 90, bio: "Practicing 5 minutes every morning.", icon: "fa-bolt" },
+            { name: "PhoneticMaster", rating: 310, mastered: 1, pct: 60, bio: "Focusing on rapid squared tokens.", icon: "fa-fire" },
+            { name: "EchoRhythm", rating: 240, mastered: 1, pct: 40, bio: "Aiming for multi-language mastery.", icon: "fa-star" },
+            { name: "AxiomRider", rating: 170, mastered: 0, pct: 80, bio: "English track almost 100% complete!", icon: "fa-shield-halved" }
+        ];
+
+        // Player Profile State
+        let playerProfile = {
+            username: 'VextomRunner',
+            bio: 'Learning Vextom cadences daily!',
+            avatarIcon: 'fa-bolt',
+            lastNameChangeDate: null,
+            vRating: 100,
+            activeLanguage: 'English',
+            languagesMasteredCount: 0,
+            languageProgress: {
+                'English': 0,
+                'Spanish': 0,
+                'French': 0,
+                'German': 0,
+                'Italian': 0
+            }
+        };
+
+        // App State
+        let flashcardCategory = 'words';
+        let currentFlashcards = [];
+        let currentFlashcardIndex = 0;
+        let isFlashcardFlipped = false;
+
+        // Anti-Cheat Blitz State
+        let blitzTimer = 30;
+        let blitzInterval = null;
+        let blitzScore = 0;
+        let blitzCorrectCount = 0;
+        let blitzStreak = 0;
+        let blitzCurrentPrompt = null;
+        let blitzPromptShownAt = 0;
+        let blitzInputLocked = false;
+
+        // Duel State
+        let duelRound = 1;
+        let duelUserScore = 0;
+        let duelBotScore = 0;
+        let currentDuelBot = null;
+        let currentDuelPrompt = null;
+        let duelInputLocked = false;
+
+        let currentDecoderPuzzle = null;
+        let decoderUserChoices = [];
+
+        // Load & Save State
+        function loadState() {
+            const saved = localStorage.getItem('vextom_user_profile_v3');
+            if (saved) {
+                try {
+                    playerProfile = { ...playerProfile, ...JSON.parse(saved) };
+                } catch(e) {}
+            }
+            updateUnlockedLanguages();
+            updateHeaderAndProfileUI();
+        }
+
+        function saveState() {
+            localStorage.setItem('vextom_user_profile_v3', JSON.stringify(playerProfile));
+            updateHeaderAndProfileUI();
+        }
+
+        function updateUnlockedLanguages() {
+            const engPct = playerProfile.languageProgress['English'] || 0;
+            const isEngComplete = engPct >= 100;
+            
+            Object.keys(LANGUAGE_DECKS).forEach(lang => {
+                if (lang === 'English') {
+                    LANGUAGE_DECKS[lang].unlocked = true;
+                } else {
+                    LANGUAGE_DECKS[lang].unlocked = isEngComplete;
+                }
+            });
+
+            let count = 0;
+            Object.keys(playerProfile.languageProgress).forEach(l => {
+                if (playerProfile.languageProgress[l] >= 100) count++;
+            });
+            playerProfile.languagesMasteredCount = count;
+        }
+
+        function updateHeaderAndProfileUI() {
+            document.getElementById('header-v-rating').textContent = `${playerProfile.vRating}V`;
+            document.getElementById('header-active-lang').textContent = playerProfile.activeLanguage;
+            document.getElementById('header-lang-pct').textContent = `${playerProfile.languageProgress[playerProfile.activeLanguage] || 0}%`;
+            document.getElementById('header-username').textContent = playerProfile.username;
+            document.getElementById('header-avatar-icon').className = `fa-solid ${playerProfile.avatarIcon}`;
+
+            document.getElementById('stat-langs-mastered').textContent = `${playerProfile.languagesMasteredCount} / 5`;
+            document.getElementById('stat-current-pct').textContent = `${playerProfile.languageProgress[playerProfile.activeLanguage] || 0}%`;
+            document.getElementById('stat-v-rating').textContent = `${playerProfile.vRating}V`;
+
+            renderLanguageSelectDropdown();
+        }
+
+        function renderLanguageSelectDropdown() {
+            const select = document.getElementById('flashcard-lang-select');
+            select.innerHTML = '';
+
+            Object.keys(LANGUAGE_DECKS).forEach(lang => {
+                const opt = document.createElement('option');
+                opt.value = lang;
+                const isUnlocked = LANGUAGE_DECKS[lang].unlocked;
+                const pct = playerProfile.languageProgress[lang] || 0;
+                opt.textContent = isUnlocked ? `${lang.toUpperCase()} (${pct}%)` : `🔒 ${lang.toUpperCase()} (COMPLETE ENGLISH FIRST)`;
+                opt.disabled = !isUnlocked;
+                if (lang === playerProfile.activeLanguage) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        function onLanguageSelectChange(lang) {
+            if (!LANGUAGE_DECKS[lang].unlocked) return;
+            playerProfile.activeLanguage = lang;
+            saveState();
+            setupFlashcardsDeck();
+        }
+
+        // Vextom Converter
+        function encodeTextToVextom(text) {
+            const words = text.split(/\s+/);
+            return words.map(rawWord => {
+                const clean = normalizeWord(rawWord);
+                const digits = [];
+                for (let i = 0; i < clean.length; i++) {
+                    const char = clean[i];
+                    if (VEXTOM_LEXICON[char]) digits.push(VEXTOM_LEXICON[char]);
+                }
+                return digits;
+            });
+        }
+
+        function formatVextomDigitStream(wordDigitArrays) {
+            return wordDigitArrays.map(arr => arr.join(' - ')).join(' &nbsp;•&nbsp; ');
+        }
+
+        function getPhoneticSpokenString(wordDigitArrays) {
+            return wordDigitArrays.map(arr => 
+                arr.map(d => PRONUNCIATIONS[d] || d).join(' — ')
+            ).join(' ... ');
+        }
+
+        function speakVextomAudio(digitArrays, rate = 1.0) {
+            const text = getPhoneticSpokenString(digitArrays);
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.rate = rate;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        // Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('section[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                btn.classList.remove('border-vextom-red', 'bg-white', 'text-vextom-red', 'font-bold', 'shadow-sm');
+                btn.classList.add('border-transparent', 'text-slate-600');
+            });
+
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('border-transparent', 'text-slate-600');
+            activeBtn.classList.add('border-vextom-red', 'bg-white', 'text-vextom-red', 'font-bold', 'shadow-sm');
+
+            if (tabId === 'flashcards') setupFlashcardsDeck();
+            if (tabId === 'decoder') { renderLexiconGrid(); updateLivePhraseBuilder(); setupNewDecoderPuzzle(); }
+            if (tabId === 'leaderboard') renderLeaderboardTable();
+        }
+
+        // ================= TAB 1: FLASHCARDS =================
+        function setFlashcardCategory(cat) {
+            flashcardCategory = cat;
+            const wBtn = document.getElementById('cat-btn-words');
+            const lBtn = document.getElementById('cat-btn-letters');
+
+            if (cat === 'words') {
+                wBtn.className = 'flex-1 sm:flex-none min-h-[40px] px-4 py-1.5 rounded-lg font-bold bg-slate-900 text-white shadow-sm transition-all btn-tap-effect';
+                lBtn.className = 'flex-1 sm:flex-none min-h-[40px] px-4 py-1.5 rounded-lg font-bold text-slate-600 hover:text-slate-900 transition-all btn-tap-effect';
+            } else {
+                lBtn.className = 'flex-1 sm:flex-none min-h-[40px] px-4 py-1.5 rounded-lg font-bold bg-slate-900 text-white shadow-sm transition-all btn-tap-effect';
+                wBtn.className = 'flex-1 sm:flex-none min-h-[40px] px-4 py-1.5 rounded-lg font-bold text-slate-600 hover:text-slate-900 transition-all btn-tap-effect';
+            }
+            setupFlashcardsDeck();
+        }
+
+        function setupFlashcardsDeck() {
+            const lang = playerProfile.activeLanguage;
+            const deck = LANGUAGE_DECKS[lang];
+
+            if (flashcardCategory === 'words') {
+                const pct = playerProfile.languageProgress[lang] || 0;
+                if (pct < 35) currentFlashcards = deck.tier1;
+                else if (pct < 70) currentFlashcards = [...deck.tier1, ...deck.tier2];
+                else currentFlashcards = [...deck.tier1, ...deck.tier2, ...deck.tier3];
+            } else {
+                currentFlashcards = Object.keys(VEXTOM_LEXICON);
+            }
+
+            currentFlashcardIndex = 0;
+            isFlashcardFlipped = false;
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            if (!currentFlashcards.length) return;
+            const item = currentFlashcards[currentFlashcardIndex];
+            
+            document.getElementById('flashcard-progress-text').textContent = `CARD ${(currentFlashcardIndex+1).toString().padStart(2,'0')} / ${currentFlashcards.length.toString().padStart(2,'0')}`;
+            document.getElementById('card-front-lang-label').textContent = `${playerProfile.activeLanguage} ${flashcardCategory.toUpperCase()}`;
+            document.getElementById('card-front-word').textContent = item;
+
+            const digitArrays = encodeTextToVextom(item);
+            const container = document.getElementById('card-back-digits');
+            container.innerHTML = '';
+
+            digitArrays.forEach((arr, wIdx) => {
+                arr.forEach((d, dIdx) => {
+                    const span = document.createElement('span');
+                    span.className = 'px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-bold';
+                    span.textContent = d;
+                    container.appendChild(span);
+
+                    if (dIdx < arr.length - 1) {
+                        const sep = document.createElement('span');
+                        sep.className = 'text-slate-300 text-xs';
+                        sep.textContent = '-';
+                        container.appendChild(sep);
+                    }
+                });
+            });
+
+            document.getElementById('card-back-phonetic').textContent = `"${getPhoneticSpokenString(digitArrays)}"`;
+
+            const frontEl = document.getElementById('card-front-content');
+            const backEl = document.getElementById('card-back-content');
+
+            if (isFlashcardFlipped) {
+                frontEl.classList.add('hidden');
+                backEl.classList.remove('hidden');
+            } else {
+                frontEl.classList.remove('hidden');
+                backEl.classList.add('hidden');
+            }
+        }
+
+        function flipFlashcard() {
+            isFlashcardFlipped = !isFlashcardFlipped;
+            renderFlashcard();
+
+            const lang = playerProfile.activeLanguage;
+            if (playerProfile.languageProgress[lang] < 100) {
+                playerProfile.languageProgress[lang] = Math.min(100, playerProfile.languageProgress[lang] + 1);
+                updateUnlockedLanguages();
+                saveState();
+            }
+        }
+
+        function nextFlashcard() {
+            currentFlashcardIndex = (currentFlashcardIndex + 1) % currentFlashcards.length;
+            isFlashcardFlipped = false;
+            renderFlashcard();
+        }
+
+        function prevFlashcard() {
+            currentFlashcardIndex = (currentFlashcardIndex - 1 + currentFlashcards.length) % currentFlashcards.length;
+            isFlashcardFlipped = false;
+            renderFlashcard();
+        }
+
+        function speakFlashcardCadence() {
+            const item = currentFlashcards[currentFlashcardIndex];
+            const digitArrays = encodeTextToVextom(item);
+            const tempo = document.getElementById('flashcard-tempo').value;
+            let rate = tempo === 'slow' ? 0.8 : (tempo === 'fast' ? 1.25 : 1.0);
+            speakVextomAudio(digitArrays, rate);
+        }
+
+        // ================= TAB 2: BLITZ MODE (WITH ANTI-CHEAT) =================
+        function startBlitzSession() {
+            blitzTimer = 30;
+            blitzScore = 0;
+            blitzCorrectCount = 0;
+            blitzStreak = 0;
+            blitzInputLocked = false;
+
+            document.getElementById('blitz-start-screen').classList.add('hidden');
+            document.getElementById('blitz-summary-screen').classList.add('hidden');
+            document.getElementById('blitz-game-arena').classList.remove('hidden');
+            document.getElementById('blitz-feedback-banner').classList.add('hidden');
+
+            document.getElementById('blitz-timer-text').textContent = '30s';
+            document.getElementById('blitz-progress-bar').style.width = '100%';
+
+            if (blitzInterval) clearInterval(blitzInterval);
+            blitzInterval = setInterval(() => {
+                blitzTimer--;
+                document.getElementById('blitz-timer-text').textContent = `${blitzTimer}s`;
+                document.getElementById('blitz-progress-bar').style.width = `${(blitzTimer / 30) * 100}%`;
+
+                if (blitzTimer <= 0) {
+                    endBlitzSession();
+                }
+            }, 1000);
+
+            generateNextBlitzPrompt();
+        }
+
+        function generateNextBlitzPrompt() {
+            const deck = LANGUAGE_DECKS[playerProfile.activeLanguage].tier1;
+            const targetWord = deck[Math.floor(Math.random() * deck.length)];
+            blitzCurrentPrompt = targetWord;
+
+            const encoded = encodeTextToVextom(targetWord)[0].join(' - ');
+            document.getElementById('blitz-prompt-display').textContent = encoded;
+
+            const options = [targetWord];
+            while (options.length < 4) {
+                const r = deck[Math.floor(Math.random() * deck.length)];
+                if (!options.includes(r)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('blitz-options-grid');
+            grid.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'min-h-[52px] p-4 bg-white border border-slate-200 hover:border-vextom-red text-slate-900 rounded-2xl font-mono text-sm font-bold transition-all shadow-sm btn-tap-effect flex items-center justify-center';
+                btn.textContent = opt;
+                btn.onclick = () => handleBlitzAnswer(opt);
+                grid.appendChild(btn);
+            });
+
+            // Anti-Cheat timestamp tracking
+            blitzPromptShownAt = performance.now();
+            blitzInputLocked = false;
+        }
+
+        function handleBlitzAnswer(selected) {
+            if (blitzInputLocked) return; // Ignore spam taps while locked
+            blitzInputLocked = true;
+
+            const elapsed = performance.now() - blitzPromptShownAt;
+            const fb = document.getElementById('blitz-feedback-banner');
+            const container = document.getElementById('blitz-container');
+            fb.classList.remove('hidden');
+
+            // ANTI-CHEAT SPAM CHECK (Reaction time threshold: 140ms)
+            if (elapsed < 140) {
+                blitzStreak = 0;
+                blitzScore = Math.max(0, blitzScore - 5);
+                container.classList.add('shake-warning');
+                setTimeout(() => container.classList.remove('shake-warning'), 400);
+
+                fb.className = 'p-4 rounded-xl bg-amber-100 text-amber-900 font-mono font-bold text-xs border border-amber-300';
+                fb.innerHTML = `<i class="fa-solid fa-shield-halved mr-1 text-vextom-red"></i> ANTI-CHEAT LOCKOUT!<br><span class="text-slate-900 font-normal">Response time (${Math.round(elapsed)}ms) was too fast. Steady your rhythm!</span>`;
+
+                setTimeout(() => {
+                    generateNextBlitzPrompt();
+                }, 750);
+                return;
+            }
+
+            const encodedDigits = encodeTextToVextom(blitzCurrentPrompt)[0].join(' - ');
+
+            if (selected === blitzCurrentPrompt) {
+                blitzCorrectCount++;
+                blitzStreak++;
+                const pts = 15 + Math.floor(blitzStreak / 3) * 5;
+                blitzScore += pts;
+
+                fb.className = 'p-3 rounded-xl bg-emerald-50 text-emerald-800 font-mono font-bold text-xs border border-emerald-200';
+                fb.textContent = `CORRECT! +${pts}V (STREAK: ${blitzStreak})`;
+                
+                // Short 220ms debounce before next question
+                setTimeout(() => {
+                    generateNextBlitzPrompt();
+                }, 220);
+            } else {
+                blitzStreak = 0;
+                blitzScore = Math.max(0, blitzScore - 5);
+                const breakdown = blitzCurrentPrompt.split('').map(l => `${l}=${VEXTOM_LEXICON[l]}`).join(' | ');
+
+                fb.className = 'p-4 rounded-xl bg-rose-50 text-rose-700 font-mono font-bold text-xs border border-rose-200';
+                fb.innerHTML = `INCORRECT.<br><span class="text-slate-900 mt-1 inline-block">CORRECT WORD: <strong class="text-vextom-red">${blitzCurrentPrompt}</strong> (${encodedDigits}) &bull; BREAKDOWN: ${breakdown}</span>`;
+
+                setTimeout(() => {
+                    generateNextBlitzPrompt();
+                }, 850);
+            }
+        }
+
+        function endBlitzSession() {
+            clearInterval(blitzInterval);
+            document.getElementById('blitz-game-arena').classList.add('hidden');
+            document.getElementById('blitz-summary-screen').classList.remove('hidden');
+
+            document.getElementById('blitz-summary-score').textContent = `+${blitzScore}V`;
+            document.getElementById('blitz-summary-correct').textContent = blitzCorrectCount;
+            document.getElementById('blitz-summary-streak').textContent = blitzStreak;
+
+            playerProfile.vRating += blitzScore;
+            
+            const lang = playerProfile.activeLanguage;
+            playerProfile.languageProgress[lang] = Math.min(100, (playerProfile.languageProgress[lang] || 0) + Math.floor(blitzCorrectCount / 2));
+            updateUnlockedLanguages();
+            saveState();
+        }
+
+        // ================= TAB 3: VERSUS DUEL =================
+        function startVersusMatchmaking() {
+            document.getElementById('versus-player-rating-display').textContent = `${playerProfile.vRating}V`;
+            document.getElementById('versus-matchmake-screen').classList.add('hidden');
+            document.getElementById('versus-searching-screen').classList.remove('hidden');
+
+            setTimeout(() => {
+                currentDuelBot = BOT_RIVALS[Math.floor(Math.random() * BOT_RIVALS.length)];
+                duelRound = 1;
+                duelUserScore = 0;
+                duelBotScore = 0;
+
+                document.getElementById('versus-searching-screen').classList.add('hidden');
+                document.getElementById('versus-arena').classList.remove('hidden');
+                
+                document.getElementById('duel-user-name').textContent = playerProfile.username;
+                document.getElementById('duel-user-rating').textContent = `${playerProfile.vRating}V`;
+                document.getElementById('duel-user-icon').className = `fa-solid ${playerProfile.avatarIcon}`;
+
+                document.getElementById('duel-bot-name').textContent = currentDuelBot.name;
+                document.getElementById('duel-bot-rating').textContent = `${currentDuelBot.rating}V`;
+
+                setupDuelRound();
+            }, 1600);
+        }
+
+        function setupDuelRound() {
+            duelInputLocked = false;
+            document.getElementById('duel-round-num').textContent = `${duelRound} / 5`;
+            document.getElementById('duel-user-score-badge').textContent = duelUserScore;
+            document.getElementById('duel-bot-score-badge').textContent = duelBotScore;
+            document.getElementById('duel-round-feedback').classList.add('hidden');
+
+            document.getElementById('duel-bot-status').innerHTML = `<i class="fa-solid fa-spinner animate-spin text-vextom-red mr-1"></i> Opponent thinking...`;
+
+            const deck = LANGUAGE_DECKS[playerProfile.activeLanguage].tier1;
+            const targetWord = deck[Math.floor(Math.random() * deck.length)];
+            currentDuelPrompt = targetWord;
+
+            document.getElementById('duel-prompt-text').textContent = targetWord;
+
+            const encodedTarget = encodeTextToVextom(targetWord)[0].join(' - ');
+            const options = [encodedTarget];
+
+            while (options.length < 4) {
+                const r = deck[Math.floor(Math.random() * deck.length)];
+                const rEnc = encodeTextToVextom(r)[0].join(' - ');
+                if (!options.includes(rEnc)) options.push(rEnc);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('duel-options-grid');
+            grid.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'min-h-[52px] p-4 bg-white border border-slate-200 hover:border-vextom-red text-slate-900 rounded-2xl font-mono text-sm font-bold transition-all shadow-sm btn-tap-effect flex items-center justify-center';
+                btn.textContent = opt;
+                btn.onclick = () => submitDuelAnswer(opt, encodedTarget);
+                grid.appendChild(btn);
+            });
+        }
+
+        function submitDuelAnswer(selected, correctDigits) {
+            if (duelInputLocked) return;
+            duelInputLocked = true;
+
+            const fb = document.getElementById('duel-round-feedback');
+            fb.classList.remove('hidden');
+
+            const isUserCorrect = (selected === correctDigits);
+            const isBotCorrect = Math.random() < 0.75;
+            if (isBotCorrect) duelBotScore++;
+
+            if (isUserCorrect) {
+                duelUserScore++;
+                fb.className = 'p-3.5 rounded-xl bg-emerald-50 text-emerald-800 font-mono font-bold text-xs border border-emerald-200';
+                fb.textContent = `ROUND WIN! Perfect cadence decoding.`;
+            } else {
+                const breakdown = currentDuelPrompt.split('').map(l => `${l}=${VEXTOM_LEXICON[l]}`).join(' | ');
+                fb.className = 'p-3.5 rounded-xl bg-rose-50 text-rose-700 font-mono font-bold text-xs border border-rose-200';
+                fb.innerHTML = `MISSED ROUND.<br><span class="text-slate-900 mt-1 inline-block">CORRECT DIGITS: <strong class="text-vextom-red">${correctDigits}</strong> &bull; BREAKDOWN: ${breakdown}</span>`;
+            }
+
+            document.getElementById('duel-user-score-badge').textContent = duelUserScore;
+            document.getElementById('duel-bot-score-badge').textContent = duelBotScore;
+
+            setTimeout(() => {
+                duelRound++;
+                if (duelRound > 5) {
+                    endVersusMatch();
+                } else {
+                    setupDuelRound();
+                }
+            }, 1800);
+        }
+
+        function endVersusMatch() {
+            document.getElementById('versus-arena').classList.add('hidden');
+            document.getElementById('versus-summary-screen').classList.remove('hidden');
+
+            const isWin = duelUserScore >= duelBotScore;
+            const delta = isWin ? 16 : -10;
+            playerProfile.vRating = Math.max(50, playerProfile.vRating + delta);
+
+            const badge = document.getElementById('versus-result-badge');
+            if (isWin) {
+                badge.className = 'inline-block px-6 py-2.5 rounded-2xl font-mono font-black text-xl bg-emerald-100 text-emerald-800 border border-emerald-300';
+                badge.textContent = 'VICTORY!';
+                document.getElementById('versus-rating-delta').textContent = `+${delta}V`;
+            } else {
+                badge.className = 'inline-block px-6 py-2.5 rounded-2xl font-mono font-black text-xl bg-rose-100 text-rose-800 border border-rose-300';
+                badge.textContent = 'DEFEAT';
+                document.getElementById('versus-rating-delta').textContent = `${delta}V`;
+            }
+
+            saveState();
+        }
+
+        function resetVersusTab() {
+            document.getElementById('versus-summary-screen').classList.add('hidden');
+            document.getElementById('versus-matchmake-screen').classList.remove('hidden');
+        }
+
+        // ================= TAB 4: DECODER & BUILDER =================
+        function setupNewDecoderPuzzle() {
+            const deck = LANGUAGE_DECKS[playerProfile.activeLanguage].tier1;
+            const word = deck[Math.floor(Math.random() * deck.length)];
+            currentDecoderPuzzle = word;
+
+            const encoded = encodeTextToVextom(word)[0];
+            document.getElementById('decoder-raw-stream').textContent = encoded.join(' - ');
+            document.getElementById('decoder-feedback').classList.add('hidden');
+
+            decoderUserChoices = new Array(word.length).fill('?');
+            renderDecoderSlots(word, encoded);
+            updateDecoderRevealedText();
+        }
+
+        function renderDecoderSlots(word, encoded) {
+            const container = document.getElementById('decoder-interactive-slots');
+            container.innerHTML = '';
+
+            encoded.forEach((digit, idx) => {
+                const slot = document.createElement('div');
+                slot.className = 'bg-white border border-slate-200 p-2.5 rounded-2xl flex flex-col items-center justify-between w-16 sm:w-20 space-y-1 shadow-sm';
+                slot.innerHTML = `
+                    <span class="text-[9px] font-mono text-slate-400 font-bold uppercase">TOKEN ${idx+1}</span>
+                    <span class="font-mono text-sm sm:text-base font-black text-slate-900">${digit}</span>
+                    <select onchange="onDecoderSlotChange(${idx}, this.value)" class="min-h-[36px] w-full bg-slate-50 border border-slate-200 rounded-lg text-slate-900 font-bold font-mono text-center text-xs py-1 focus:outline-none">
+                        <option value="?">?</option>
+                        ${Object.keys(VEXTOM_LEXICON).map(l => `<option value="${l}">${l}</option>`).join('')}
+                    </select>
+                `;
+                container.appendChild(slot);
+            });
+        }
+
+        function onDecoderSlotChange(idx, val) {
+            decoderUserChoices[idx] = val;
+            updateDecoderRevealedText();
+        }
+
+        function updateDecoderRevealedText() {
+            document.getElementById('decoder-revealed-text').textContent = decoderUserChoices.map(c => c === '?' ? '_' : c).join(' ');
+        }
+
+        function checkDecoderPuzzle() {
+            const solved = decoderUserChoices.join('');
+            const fb = document.getElementById('decoder-feedback');
+            fb.classList.remove('hidden');
+
+            if (solved === currentDecoderPuzzle) {
+                fb.className = 'p-3.5 rounded-xl bg-emerald-50 text-emerald-800 font-mono font-bold text-xs border border-emerald-200';
+                fb.textContent = `DECODED SUCCESSFULLY: ${currentDecoderPuzzle}`;
+                setTimeout(setupNewDecoderPuzzle, 1400);
+            } else {
+                const encodedDigits = encodeTextToVextom(currentDecoderPuzzle)[0].join(' - ');
+                const breakdown = currentDecoderPuzzle.split('').map(letter => `${letter} = ${VEXTOM_LEXICON[letter]}`).join(' | ');
+                fb.className = 'p-3.5 rounded-xl bg-rose-50 text-rose-700 font-mono font-bold text-xs border border-rose-200';
+                fb.innerHTML = `INCORRECT DECODING.<br><span class="text-slate-900 mt-1 inline-block">CORRECT WORD: <strong class="text-vextom-red">${currentDecoderPuzzle}</strong> (${encodedDigits}) &bull; BREAKDOWN: ${breakdown}</span>`;
+            }
+        }
+
+        function updateLivePhraseBuilder() {
+            const text = document.getElementById('builder-input-text').value;
+            const digitArrays = encodeTextToVextom(text);
+            const outputEl = document.getElementById('builder-output-digits');
+            const previewEl = document.getElementById('builder-phonetic-preview');
+
+            if (!digitArrays.length || !digitArrays[0].length) {
+                outputEl.textContent = '---';
+                previewEl.textContent = '"---"';
+            } else {
+                outputEl.innerHTML = formatVextomDigitStream(digitArrays);
+                previewEl.textContent = `"${getPhoneticSpokenString(digitArrays)}"`;
+            }
+        }
+
+        function playBuilderSpokenPhrase() {
+            const text = document.getElementById('builder-input-text').value;
+            speakVextomAudio(encodeTextToVextom(text));
+        }
+
+        function renderLexiconGrid() {
+            const grid = document.getElementById('lexicon-grid');
+            grid.innerHTML = '';
+
+            Object.keys(VEXTOM_LEXICON).forEach(letter => {
+                const code = VEXTOM_LEXICON[letter];
+                const card = document.createElement('div');
+                card.className = 'min-h-[52px] bg-white border border-slate-200 p-2 rounded-2xl flex flex-col items-center justify-center hover:border-vextom-red transition-all cursor-pointer shadow-sm btn-tap-effect';
+                card.onclick = () => speakVextomAudio([[code]]);
+
+                card.innerHTML = `
+                    <span class="text-[9px] text-slate-400 font-bold">${letter}</span>
+                    <span class="font-mono text-xs sm:text-sm font-black text-slate-900">${code}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ================= TAB 5: LEADERBOARD =================
+        function renderLeaderboardTable() {
+            const tbody = document.getElementById('leaderboard-table-body');
+            tbody.innerHTML = '';
+
+            const allPlayers = [
+                ...BOT_RIVALS,
+                {
+                    name: playerProfile.username,
+                    rating: playerProfile.vRating,
+                    mastered: playerProfile.languagesMasteredCount,
+                    pct: playerProfile.languageProgress[playerProfile.activeLanguage] || 0,
+                    bio: playerProfile.bio,
+                    icon: playerProfile.avatarIcon,
+                    isUser: true
+                }
+            ];
+
+            allPlayers.sort((a, b) => b.rating - a.rating);
+
+            allPlayers.forEach((p, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-orange-50/50 cursor-pointer transition-colors ${p.isUser ? 'bg-orange-50/80 font-bold' : ''}`;
+                tr.onclick = () => openJourneyModal(p, idx + 1);
+
+                tr.innerHTML = `
+                    <td class="py-3 pl-2 font-bold text-slate-400">#${idx + 1}</td>
+                    <td class="py-3 flex items-center gap-2">
+                        <div class="w-6 h-6 rounded-lg bg-slate-900 text-amber-400 flex items-center justify-center text-[10px] shrink-0">
+                            <i class="fa-solid ${p.icon || 'fa-bolt'}"></i>
+                        </div>
+                        <span class="text-slate-900 font-bold truncate max-w-[100px] sm:max-w-none">${escapeHtml(p.name)} ${p.isUser ? '<span class="text-[9px] bg-vextom-red text-white px-1 rounded ml-0.5">YOU</span>' : ''}</span>
+                    </td>
+                    <td class="py-3 text-center font-bold text-amber-600">${p.rating}V</td>
+                    <td class="py-3 text-center font-bold text-slate-700">${p.mastered} / 5</td>
+                    <td class="py-3 text-right pr-2">
+                        <span class="bg-orange-100 text-orange-800 px-2 py-0.5 rounded-lg font-bold text-[11px]">${p.pct}%</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openJourneyModal(player, rank) {
+            document.getElementById('modal-player-name').textContent = player.name;
+            document.getElementById('modal-player-rating').textContent = `${player.rating}V`;
+            document.getElementById('modal-player-rank').textContent = `RANK #${rank}`;
+            document.getElementById('modal-player-bio').textContent = player.bio || 'Vextom speed cadence learner.';
+            document.getElementById('modal-player-langs').textContent = `${player.mastered} / 5`;
+            document.getElementById('modal-player-pct').textContent = `${player.pct}%`;
+            document.getElementById('modal-player-icon').className = `fa-solid ${player.icon || 'fa-bolt'}`;
+
+            document.getElementById('journey-modal').classList.remove('hidden');
+        }
+
+        function closeJourneyModal() {
+            document.getElementById('journey-modal').classList.add('hidden');
+        }
+
+        // ================= PROFILE MODAL & COOLDOWN =================
+        function openProfileModal() {
+            document.getElementById('edit-username-input').value = playerProfile.username;
+            document.getElementById('edit-bio-input').value = playerProfile.bio;
+            document.getElementById('edit-avatar-icon-preview').className = `fa-solid ${playerProfile.avatarIcon}`;
+
+            checkNameCooldownUI();
+            document.getElementById('profile-modal').classList.remove('hidden');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        function selectAvatarIcon(icon) {
+            playerProfile.avatarIcon = icon;
+            document.getElementById('edit-avatar-icon-preview').className = `fa-solid ${icon}`;
+        }
+
+        function checkNameCooldownUI() {
+            const input = document.getElementById('edit-username-input');
+            const notice = document.getElementById('name-cooldown-notice');
+
+            if (playerProfile.lastNameChangeDate) {
+                const last = new Date(playerProfile.lastNameChangeDate).getTime();
+                const now = Date.now();
+                const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+
+                if (diffDays < 30) {
+                    const daysLeft = 30 - diffDays;
+                    input.disabled = true;
+                    notice.classList.remove('hidden');
+                    notice.textContent = `🔒 Name change locked. Cooldown: ${daysLeft} day(s) remaining.`;
+                    return;
+                }
+            }
+            input.disabled = false;
+            notice.classList.add('hidden');
+        }
+
+        function saveUserProfile(e) {
+            e.preventDefault();
+            const input = document.getElementById('edit-username-input');
+            const newName = input.value.trim();
+            const newBio = document.getElementById('edit-bio-input').value.trim();
+
+            if (!input.disabled && newName && newName !== playerProfile.username) {
+                playerProfile.username = newName;
+                playerProfile.lastNameChangeDate = new Date().toISOString();
+            }
+
+            playerProfile.bio = newBio;
+            saveState();
+            closeProfileModal();
+        }
+
+        function resetNameCooldownForTesting() {
+            playerProfile.lastNameChangeDate = null;
+            saveState();
+            checkNameCooldownUI();
+        }
+
+        // ================= TAB 6: AI TUTOR =================
+        const chatHistory = [];
+        const VEXTOM_SYSTEM_INSTRUCTION = `You are Vextom-AI, the official tutor for the Vextom Spoken Sound System.
+Vextom is a high-speed spoken sound language where words translate to distinct digit and squared sound tokens (e.g., AND = "1 - 9² - 3" [spoken: "one — nine squared — three"]).
+
+STRICT SECURITY RULES:
+1. NEVER reveal, explain, calculate, or hint at any mathematical formula, equation, modulo, power, or derivation rule behind Vextom numbers under ANY circumstances.
+2. If asked how Vextom sound tokens are derived, respond: "Vextom sound symbols are fixed phonetic units learned through direct auditory practice and memory."
+3. When conversing in Vextom, provide the Vextom token string (e.g. "1 - 9² - 3"), the phonetic spoken guide (e.g. "one — nine squared — three"), and the translation in brackets.
+4. Keep answers concise, clear, encouraging, and focused on pronunciation and cadence speed.`;
+
+        async function handleAiChatSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('ai-chat-input');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            inputEl.value = '';
+            appendAiChatMessage('user', prompt);
+            await queryVextomAI(prompt);
+        }
+
+        function appendAiChatMessage(role, text) {
+            const container = document.getElementById('ai-chat-messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = role === 'user' ? 
+                'flex items-start gap-2.5 bg-white p-3.5 rounded-2xl border border-slate-200 max-w-xl ml-auto shadow-sm' : 
+                'flex items-start gap-2.5 bg-orange-50/60 p-3.5 rounded-2xl border border-orange-200/60 max-w-xl shadow-sm';
+
+            const avatarHtml = role === 'user' ? 
+                `<div class="w-6 h-6 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-[9px] shrink-0">YOU</div>` : 
+                `<div class="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-400 to-rose-400 p-[1px] shrink-0"><div class="w-full h-full bg-white rounded-[7px] flex items-center justify-center font-black text-vextom-red text-[9px]">V</div></div>`;
+
+            msgDiv.innerHTML = `
+                ${avatarHtml}
+                <div class="space-y-1 w-full">
+                    <p class="text-slate-800 leading-relaxed whitespace-pre-wrap">${escapeHtml(text)}</p>
+                </div>
+            `;
+
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        async function queryVextomAI(userPrompt) {
+            const indicator = document.getElementById('ai-typing-indicator');
+            const sendBtn = document.getElementById('ai-send-btn');
+
+            indicator.classList.remove('hidden');
+            sendBtn.disabled = true;
+
+            chatHistory.push({ role: 'user', parts: [{ text: userPrompt }] });
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: chatHistory,
+                systemInstruction: { parts: [{ text: VEXTOM_SYSTEM_INSTRUCTION }] }
+            };
+
+            let responseText = "";
+            let attempts = 0;
+            const maxAttempts = 3;
+
+            while (attempts < maxAttempts) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        responseText = result.candidates?.[0]?.content?.parts?.[0]?.text || "Vextom cadence received.";
+                        break;
+                    }
+                } catch (err) {
+                    console.error("Fetch attempt failed", err);
+                }
+                attempts++;
+                if (attempts < maxAttempts) {
+                    await new Promise(r => setTimeout(r, Math.pow(2, attempts) * 1000));
+                }
+            }
+
+            if (!responseText) {
+                responseText = "Vextom AI signal interrupted. Please try again.";
+            }
+
+            chatHistory.push({ role: 'model', parts: [{ text: responseText }] });
+            indicator.classList.add('hidden');
+            sendBtn.disabled = false;
+
+            appendAiChatMessage('model', responseText);
+
+            if (document.getElementById('ai-auto-speak').checked) {
+                const cleaned = responseText.replace(/\[.*?\]/g, '').replace(/[\#\*\_\`]/g, '');
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                    const u = new SpeechSynthesisUtterance(cleaned);
+                    window.speechSynthesis.speak(u);
+                }
+            }
+        }
+
+        // Window Initialization
+        window.onload = function() {
+            loadState();
+            setupFlashcardsDeck();
+        };
+    </script>
+</body>
+</html>
